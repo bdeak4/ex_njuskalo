@@ -18,37 +18,19 @@ defmodule ExNjuskalo do
       |> URI.encode_query()
 
     get_resp("search-suggestions?" <> qs)
-    |> IO.inspect()
     |> Map.get("data")
     |> Enum.map(fn r ->
       %{
         label: r["attributes"]["label"],
-        group_id:
-          r["id"]
-          |> String.to_integer()
+        group_id: String.to_integer(r["id"])
       }
     end)
   end
 
   def get_resp(path) do
-    token =
-      api_url("token")
-      |> HTTPoison.post!({:form, [{"grant_type", "client_credentials"}]}, [
-        {
-          "authorization",
-          "Basic bmp1c2thbG9fYW5kcm9pZF9tb2JpbGVfYXBwOmQxZTM1OGU2ZTNiNzA3MjgyY2RkMDZlOTE5ZjdlMDhj"
-        },
-        {
-          "user-agent",
-          "Dalvik/2.1.0 (Linux; U; Android 10; SM-G950F Build/QQ3A.200805.001)"
-        }
-      ])
-      |> Map.get(:body)
-      |> Jason.decode!()
-
     api_url(path)
     |> HTTPoison.get!([
-      {"authorization", "#{token["token_type"]} #{token["access_token"]}"},
+      {"authorization", get_token([{"grant_type", "client_credentials"}])},
       {
         "version",
         "2.1"
@@ -66,7 +48,30 @@ defmodule ExNjuskalo do
     :todo
   end
 
+  defp get_token(formdata) do
+    api_url("token")
+    |> HTTPoison.post!({:form, formdata}, [
+      {
+        "authorization",
+        "Basic " <> Application.fetch_env!(:ex_njuskalo, :basic_auth_token)
+      },
+      {
+        "user-agent",
+        "Dalvik/2.1.0 (Linux; U; Android 10; SM-G950F Build/QQ3A.200805.001)"
+      }
+    ])
+    |> Map.get(:body)
+    |> Jason.decode!()
+    |> Map.get("access_token")
+    |> String.replace_prefix("", "Bearer ")
+  end
+
   defp api_url(path) do
-    "https://iapi.njuskalo.hr/ccapi/v2/" <> path
+    "https://ia" <>
+      "pi.nj" <>
+      "uskal" <>
+      "o.hr/c" <>
+      "cap" <>
+      "i/v2/" <> path
   end
 end
