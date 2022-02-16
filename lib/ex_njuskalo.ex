@@ -110,17 +110,13 @@ defmodule ExNjuskalo do
             end)
 
           Map.put(ad, "image", image)
-        end)
+        end),
+      total_ads: resp["meta"]["totalAdCount"]
     }
     |> maybe_put(
       resp["meta"]["aggregations"]["categoryId"]["groups"] != nil,
       :categories,
       resp["meta"]["aggregations"]["categoryId"]["groups"]
-    )
-    |> maybe_put(
-      resp["meta"]["totalAdCount"] != nil,
-      :total_ads,
-      resp["meta"]["totalAdCount"]
     )
   end
 
