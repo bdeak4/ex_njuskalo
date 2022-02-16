@@ -68,6 +68,22 @@ defmodule ExNjuskalo do
   end
 
   @doc """
+  Returns car ads
+  """
+  def car_ads(id), do: car_ads(id, "relevance")
+
+  def car_ads(id, sort) do
+    qs =
+      %{
+        vehicleIds: id,
+        rootCategoryId: 7
+      }
+      |> maybe_put(sort != nil, "sort[#{sort}]", 1)
+
+    get_list(qs)
+  end
+
+  @doc """
   Returns search suggestions
   """
   def search_suggestions(query) do
@@ -77,12 +93,7 @@ defmodule ExNjuskalo do
 
     get_resp("search-suggestions?" <> qs)
     |> Map.get("data")
-    |> Enum.map(fn r ->
-      %{
-        label: r["attributes"]["label"],
-        category_id: String.to_integer(r["id"])
-      }
-    end)
+    |> Enum.map(fn r -> r["attributes"]["label"] end)
   end
 
   defp get_list(qs) do
