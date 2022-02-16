@@ -1,11 +1,8 @@
 # ExNjuskalo
 
-**TODO: Add description**
+ExNjuskalo is unofficial elixir lib for accessing njuskalo.hr public data and managing njuskalo account.
 
 ## Installation
-
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `ex_njuskalo` to your list of dependencies in `mix.exs`:
 
 ```elixir
 def deps do
@@ -15,7 +12,8 @@ def deps do
 end
 ```
 
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/ex_njuskalo](https://hexdocs.pm/ex_njuskalo).
+## Documentation
 
+<https://hexdocs.pm/ex_njuskalo>
+
+<https://hex.pm/packages/ex_njuskalo>
