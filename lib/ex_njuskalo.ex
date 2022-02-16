@@ -14,18 +14,60 @@ defmodule ExNjuskalo do
   - `expensive` (S višom cijenom)
   - `cheap` (S nižom cijenom)
   """
-  def search_ads(query), do: search_ads(query, nil, "relevance")
-  def search_ads(query, category_id), do: search_ads(query, category_id, "relevance")
+  def search_ads(query), do: search_ads(query, nil, 1, "relevance")
+  def search_ads(query, category_id), do: search_ads(query, category_id, 1, "relevance")
+  def search_ads(query, category_id, page), do: search_ads(query, category_id, page, "relevance")
 
-  def search_ads(query, category_id, sort) do
+  def search_ads(query, category_id, page, sort) do
     qs =
       %{
         search: query,
-        include: "adListItems.image.variations",
+        page: page,
         rootCategoryId: 0
       }
       |> maybe_put(category_id != nil, "categoryId[#{category_id}]", 1)
       |> maybe_put(sort != nil, "sort[#{sort}]", 1)
+
+    get_list(qs)
+  end
+
+  @doc """
+  Returns ads in category
+  """
+  def category(id), do: category(id, "relevance")
+
+  def category(id, sort) do
+    qs =
+      %{
+        rootCategoryId: id
+      }
+      |> maybe_put(sort != nil, "sort[#{sort}]", 1)
+
+    get_list(qs)
+  end
+
+  @doc """
+  Returns search suggestions
+  """
+  def search_suggestions(query) do
+    qs =
+      %{"filter[term]": query}
+      |> URI.encode_query()
+
+    get_resp("search-suggestions?" <> qs)
+    |> Map.get("data")
+    |> Enum.map(fn r ->
+      %{
+        label: r["attributes"]["label"],
+        category_id: String.to_integer(r["id"])
+      }
+    end)
+  end
+
+  defp get_list(qs) do
+    qs =
+      qs
+      |> Map.put("include", "adListItems.image.variations")
       |> URI.encode_query()
 
     resp = get_resp("mobile/page-ad-list?" <> qs)
@@ -47,31 +89,21 @@ defmodule ExNjuskalo do
             end)
 
           Map.put(ad, "image", image)
-        end),
-      categories: resp["meta"]["aggregations"]["categoryId"]["groups"],
-      total_ads: resp["meta"]["totalAdCount"]
+        end)
     }
+    |> maybe_put(
+      resp["meta"]["aggregations"]["categoryId"]["groups"] != nil,
+      :categories,
+      resp["meta"]["aggregations"]["categoryId"]["groups"]
+    )
+    |> maybe_put(
+      resp["meta"]["totalAdCount"] != nil,
+      :total_ads,
+      resp["meta"]["totalAdCount"]
+    )
   end
 
-  @doc """
-  Returns search suggestions
-  """
-  def search_suggestions(query) do
-    qs =
-      %{"filter[term]": query}
-      |> URI.encode_query()
-
-    get_resp("search-suggestions?" <> qs)
-    |> Map.get("data")
-    |> Enum.map(fn r ->
-      %{
-        label: r["attributes"]["label"],
-        category_id: String.to_integer(r["id"])
-      }
-    end)
-  end
-
-  def get_resp(path) do
+  defp get_resp(path) do
     api_url(path)
     |> HTTPoison.get!([
       {"authorization", get_token([{"grant_type", "client_credentials"}])},
