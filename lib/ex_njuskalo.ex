@@ -47,6 +47,27 @@ defmodule ExNjuskalo do
   end
 
   @doc """
+  Returns all categories
+  """
+  def categories do
+    get_resp("mobile/page-category-hierarchy")
+  end
+
+  @doc """
+  Returns car models
+  """
+  def car_models(), do: car_models(nil)
+
+  def car_models(parent_id) do
+    qs =
+      %{}
+      |> maybe_put("filter[parent]", parent_id)
+      |> URI.encode_query()
+
+    get_resp("form-data/choice/vehicle?" <> qs)
+  end
+
+  @doc """
   Returns search suggestions
   """
   def search_suggestions(query) do
