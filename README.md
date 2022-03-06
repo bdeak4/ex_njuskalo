@@ -12,6 +12,8 @@ def deps do
 end
 ```
 
+add `basic_auth_token`, `username` and `password` in [config.exs](https://github.com/bdeak4/ex_njuskalo/blob/master/config/config.exs)
+
 ## Documentation
 
 <https://hexdocs.pm/ex_njuskalo>
