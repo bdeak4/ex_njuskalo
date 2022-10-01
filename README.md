@@ -2,7 +2,7 @@
 
 ExNjuskalo is unofficial elixir lib for accessing njuskalo.hr public data and managing njuskalo account.
 
-## Add to projct
+## Add to project
 
 ```elixir
 def deps do
