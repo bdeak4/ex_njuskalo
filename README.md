@@ -2,7 +2,7 @@
 
 ExNjuskalo is unofficial elixir lib for accessing njuskalo.hr public data and managing njuskalo account.
 
-## Installation
+## Add to projct
 
 ```elixir
 def deps do
@@ -13,6 +13,15 @@ end
 ```
 
 add `basic_auth_token`, `username` and `password` in [config.exs](https://github.com/bdeak4/ex_njuskalo/blob/master/config/config.exs)
+
+## Explore API
+
+```sh
+git clone https://github.com/bdeak4/ex_njuskalo
+cd ex_njuskalo
+mix deps.get
+iex -S mix
+```
 
 ## Documentation
 
