@@ -7,7 +7,7 @@ ExNjuskalo is unofficial elixir lib for accessing njuskalo.hr public data and ma
 ```elixir
 def deps do
   [
-    {:ex_njuskalo, "~> 0.1.0"}
+    {:ex_njuskalo, "~> 0.1.3"}
   ]
 end
 ```
