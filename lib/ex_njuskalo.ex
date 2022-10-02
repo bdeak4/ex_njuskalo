@@ -3,6 +3,8 @@ defmodule ExNjuskalo do
   ExNjuskalo is unofficial elixir lib for accessing njuskalo.hr public data and managing njuskalo account.
   """
 
+  alias ExNjuskalo.Helpers
+
   @doc """
   Returns search results
 
@@ -25,8 +27,8 @@ defmodule ExNjuskalo do
         page: page,
         rootCategoryId: 0
       }
-      |> maybe_put(category_id != nil, "categoryId[#{category_id}]", 1)
-      |> maybe_put(sort != nil, "sort[#{sort}]", 1)
+      |> Helpers.maybe_put(category_id != nil, "categoryId[#{category_id}]", 1)
+      |> Helpers.maybe_put(sort != nil, "sort[#{sort}]", 1)
 
     get_list(qs)
   end
@@ -41,7 +43,7 @@ defmodule ExNjuskalo do
       %{
         rootCategoryId: id
       }
-      |> maybe_put(sort != nil, "sort[#{sort}]", 1)
+      |> Helpers.maybe_put(sort != nil, "sort[#{sort}]", 1)
 
     get_list(qs)
   end
@@ -61,7 +63,7 @@ defmodule ExNjuskalo do
   def car_models(parent_id) do
     qs =
       %{}
-      |> maybe_put("filter[parent]", parent_id)
+      |> Helpers.maybe_put("filter[parent]", parent_id)
       |> URI.encode_query()
 
     get_resp("form-data/choice/vehicle?" <> qs)
@@ -78,7 +80,7 @@ defmodule ExNjuskalo do
         vehicleIds: id,
         rootCategoryId: 7
       }
-      |> maybe_put(sort != nil, "sort[#{sort}]", 1)
+      |> Helpers.maybe_put(sort != nil, "sort[#{sort}]", 1)
 
     get_list(qs)
   end
@@ -124,7 +126,7 @@ defmodule ExNjuskalo do
         end),
       total_ads: resp["meta"]["totalAdCount"]
     }
-    |> maybe_put(
+    |> Helpers.maybe_put(
       resp["meta"]["aggregations"]["categoryId"]["groups"] != nil,
       :categories,
       resp["meta"]["aggregations"]["categoryId"]["groups"]
@@ -146,6 +148,7 @@ defmodule ExNjuskalo do
     ])
     |> Map.get(:body)
     |> Jason.decode!()
+    |> Helpers.atomize_keys()
   end
 
   # defp get_resp_with_auth(path) do
@@ -178,9 +181,4 @@ defmodule ExNjuskalo do
       "cap" <>
       "i/v2/" <> path
   end
-
-  defp maybe_put(map, _key, nil), do: map
-  defp maybe_put(map, key, value), do: Map.put(map, key, value)
-  defp maybe_put(map, false, _key, _value), do: map
-  defp maybe_put(map, true, key, value), do: maybe_put(map, key, value)
 end
